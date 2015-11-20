@@ -1,4 +1,9 @@
-package com.github.aesteve.vertx.impl;
+package com.github.aesteve.vertx.gradle.impl;
+
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -14,29 +19,24 @@ import org.gradle.tooling.ProjectConnection;
 import org.gradle.tooling.ResultHandler;
 import org.gradle.tooling.model.GradleProject;
 
-import com.github.aesteve.vertx.GradleService;
-import com.github.aesteve.vertx.io.EventBusOutputStream;
-import com.github.aesteve.vertx.io.EventBusProgressListener;
-
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
+import com.github.aesteve.vertx.gradle.GradleService;
+import com.github.aesteve.vertx.gradle.io.EventBusOutputStream;
+import com.github.aesteve.vertx.gradle.io.EventBusProgressListener;
 
 public class GradleServiceImpl implements GradleService {
 
 	private Vertx vertx;
-	
+
 	public GradleServiceImpl(Vertx vertx) {
 		this.vertx = vertx;
 	}
-	
+
 	@Override
 	public void project(URL url, Handler<AsyncResult<GradleProject>> handler) {
 		File f;
 		try {
 			f = new File(url.toURI());
-		} catch(URISyntaxException use) {
+		} catch (URISyntaxException use) {
 			handler.handle(Future.failedFuture(use));
 			return;
 		}
@@ -51,9 +51,9 @@ public class GradleServiceImpl implements GradleService {
 			connector.forProjectDirectory(file);
 			ProjectConnection conn = connector.connect();
 			future.complete(conn.getModel(GradleProject.class));
-		}, handler);		
+		}, handler);
 	}
-	
+
 	@Override
 	public String runTask(File file, String taskName, Handler<AsyncResult<Void>> handler) {
 		return runTask(file, taskName, null, null, handler);
@@ -63,7 +63,7 @@ public class GradleServiceImpl implements GradleService {
 	public String runTask(URL url, String taskName, Handler<AsyncResult<Void>> handler) {
 		return runTask(url, taskName, null, null, handler);
 	}
-	
+
 	@Override
 	public String runTask(File file, String taskName, String javaHome, Handler<AsyncResult<Void>> handler) {
 		return runTask(file, taskName, javaHome, null, handler);
@@ -89,13 +89,13 @@ public class GradleServiceImpl implements GradleService {
 		File f;
 		try {
 			f = new File(url.toURI());
-		} catch(URISyntaxException use) {
+		} catch (URISyntaxException use) {
 			handler.handle(Future.failedFuture(use));
 			return null;
 		}
 		return runTasks(f, taskNames, javaHome, jvmArguments, handler);
 	}
-	
+
 	@Override
 	public String runTasks(File file, List<String> taskNames, String javaHome, Iterable<String> jvmArguments, Handler<AsyncResult<Void>> handler) {
 		String identifier = "gradle.task." + taskNames + "." + String.valueOf(new Date().getTime());
@@ -117,7 +117,7 @@ public class GradleServiceImpl implements GradleService {
 		launcher.forTasks(taskNames.toArray(new String[0])).run(resultHandler(handler));
 		return identifier;
 	}
-	
+
 	@Override
 	public String runTasks(File file, List<String> taskNames, Handler<AsyncResult<Void>> handler) {
 		return runTasks(file, taskNames, null, null, handler);
@@ -150,12 +150,12 @@ public class GradleServiceImpl implements GradleService {
 
 	@Override
 	public String runTask(File file, String taskName, String javaHome, Iterable<String> jvmArguments, Handler<AsyncResult<Void>> handler) {
-		return runTasks(file, Arrays.asList(new String[]{taskName}), javaHome, jvmArguments, handler);
+		return runTasks(file, Arrays.asList(new String[] { taskName }), javaHome, jvmArguments, handler);
 	}
 
 	@Override
 	public String runTask(URL url, String taskName, String javaHome, Iterable<String> jvmArguments, Handler<AsyncResult<Void>> handler) {
-		return runTasks(url, Arrays.asList(new String[]{taskName}), javaHome, jvmArguments, handler);
+		return runTasks(url, Arrays.asList(new String[] { taskName }), javaHome, jvmArguments, handler);
 	}
 
 	private static ResultHandler<Void> resultHandler(Handler<AsyncResult<Void>> handler) {
@@ -163,6 +163,7 @@ public class GradleServiceImpl implements GradleService {
 			public void onComplete(Void result) {
 				handler.handle(Future.succeededFuture());
 			}
+
 			public void onFailure(GradleConnectionException gce) {
 				handler.handle(Future.failedFuture(gce));
 			}

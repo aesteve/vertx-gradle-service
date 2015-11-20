@@ -1,4 +1,9 @@
-package com.github.aesteve.vertx;
+package com.github.aesteve.vertx.gradle;
+
+import io.vertx.core.Vertx;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 import java.net.URL;
 
@@ -8,32 +13,26 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import io.vertx.core.Vertx;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
-
 @RunWith(VertxUnitRunner.class)
 public class GradleServiceTestBase {
-	
+
 	protected Vertx vertx;
 	protected GradleService gradle;
 	protected final URL simpleProj = this.getClass().getResource("/simple-java");
 
-	
 	@Before
 	public void setUp() {
 		vertx = Vertx.vertx();
 		gradle = GradleService.create(vertx);
 	}
-	
+
 	@After
 	public void tearDown() {
 		if (vertx != null) {
 			vertx.close();
 		}
 	}
-	
+
 	@Test
 	public void getProject(TestContext context) throws Exception {
 		Async async = context.async();
@@ -44,7 +43,7 @@ public class GradleServiceTestBase {
 			async.complete();
 		});
 	}
-	
+
 	@Test
 	public void launchTask(TestContext context) throws Exception {
 		Async async = context.async();
@@ -73,7 +72,7 @@ public class GradleServiceTestBase {
 			progress.append(eventTime + ":" + message.body().toString() + "\n");
 		});
 	}
-	
+
 	@Test
 	public void failTask(TestContext context) throws Exception {
 		Async async = context.async();
@@ -82,5 +81,5 @@ public class GradleServiceTestBase {
 			async.complete();
 		});
 	}
-	
+
 }
