@@ -4,10 +4,15 @@ plugins {
 	id 'maven'
 }
 
+group='com.github.aesteve'
+version='0.1-SNAPSHOT'
+
 def vertxVersion = '3.1.0'
 def gradleVersion= '2.9'
 
+
 repositories {
+	mavenLocal()
 	mavenCentral()
 	maven { url 'http://repo.gradle.org/gradle/libs-releases-local' }
 }
@@ -20,6 +25,6 @@ dependencies {
 	testCompile "io.vertx:vertx-unit:${vertxVersion}"	
 }
 
-wrapper {
-	version gradleVersion
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.9'
 }
